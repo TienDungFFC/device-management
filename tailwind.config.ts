@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+const plugin = require("tailwindcss/plugin");
 
 const config: Config = {
   content: [
@@ -15,6 +16,21 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    plugin(function ({ addUtilities }) {
+      addUtilities({
+        ".text-center-except-first > :not(:first-child)": {
+          textAlign: "center",
+        },
+      });
+    }),
+  ],
 };
 export default config;
+function addUtilities(arg0: {
+  ".content-auto": { "content-visibility": string };
+  ".content-hidden": { "content-visibility": string };
+  ".content-visible": { "content-visibility": string };
+}) {
+  throw new Error("Function not implemented.");
+}

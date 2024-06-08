@@ -31,3 +31,8 @@ body {
     text-wrap: balance;
   }
 }
+
+.table-header-tr th,
+.text-center-except-first td {
+  padding: 0.5rem 0;
+}
