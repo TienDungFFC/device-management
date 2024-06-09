@@ -4,10 +4,13 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function Login() {
+  const router = useRouter();
+  if (localStorage.getItem("userId")) {
+    router.push("/device-management");
+  }
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const router = useRouter();
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();

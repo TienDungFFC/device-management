@@ -22,7 +22,12 @@ export async function POST(req: Request) {
       },
     });
   } catch (err) {
-    return new NextResponse(JSON.stringify(err ?? null), {
+    let errorMessage = "An error occurred"; // Mặc định nếu không có thông báo lỗi cụ thể
+    if (err instanceof Error) {
+      errorMessage = err.message || "An error occurred";
+    }
+    const errorData = { message: errorMessage };
+    return new NextResponse(JSON.stringify(errorData ?? null), {
       status: 500,
       headers: {
         "Content-Type": "application/json",

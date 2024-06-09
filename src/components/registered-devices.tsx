@@ -20,6 +20,10 @@ export default function RegisteredDevices({
   const [newDevices, setNewDevices] = useState<{ name: string; id: string }[]>([
     { name: "", id: "" },
   ]);
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [errorRegisteredDevice, setErrorRegisteredDevice] = useState<
+    string | null
+  >(null);
 
   const handleAddNewDevice = () => {
     setNewDevices([...newDevices, { name: "", id: "" }]);
@@ -49,16 +53,18 @@ export default function RegisteredDevices({
           body: formData,
         });
 
-        if (res.ok) {
-          const updatedNewDevices = [...newDevices];
-          updatedNewDevices.splice(index, 1);
-          setNewDevices(updatedNewDevices);
-          getRegisteredDevices();
-        } else {
-          console.error("Error registering device:", res.statusText);
+        if (res.status !== 200) {
+          const errorData = await res.json();
+          setErrorRegisteredDevice(errorData.message);
+          return;
         }
-      } catch (error) {
+        const updatedNewDevices = [...newDevices];
+        updatedNewDevices.splice(index, 1);
+        setNewDevices(updatedNewDevices);
+        getRegisteredDevices();
+      } catch (error: any) {
         console.error("Error registering device:", error);
+        setErrorRegisteredDevice(error.message);
       }
     }
   };
@@ -69,7 +75,7 @@ export default function RegisteredDevices({
     setNewDevices(updatedNewDevices);
   };
   return (
-    <div className="border-solid border-[1px] rounded-xl p-5 border-[#e7e7e7e]">
+    <div className="border-solid border-[1px] rounded-xl p-5 border-[#e7e7e7e] max-h-[600px] overflow-y-auto">
       <h3 className="font-bold text-lg mb-2">Registered Devices</h3>
 
       <table className="table-auto w-full">
@@ -106,7 +112,7 @@ export default function RegisteredDevices({
             <tr key={`new-${i}`} className="text-center-except-first">
               <td>
                 <input
-                  className="py-1 rounded-lg w-full"
+                  className="py-1 rounded-lg w-full outline-none"
                   type="text"
                   name="name"
                   value={newDevice.name}
@@ -116,7 +122,7 @@ export default function RegisteredDevices({
               </td>
               <td>
                 <input
-                  className="py-1 rounded-lg w-full"
+                  className="py-1 rounded-lg w-full outline-none"
                   type="text"
                   name="id"
                   value={newDevice.id}
@@ -152,6 +158,9 @@ export default function RegisteredDevices({
       >
         New device
       </p>
+      {errorRegisteredDevice && (
+        <p className="text-center text-red-500 mt-2">{errorRegisteredDevice}</p>
+      )}
     </div>
   );
 }

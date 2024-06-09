@@ -41,8 +41,9 @@ export default function DeviceManagement() {
   const [registeredDevices, setRegisteredDevices] =
     useState<RegisteredDevice[]>();
 
-  const [activeVideo, setActiveVideo] = useState();
-  const [activeMap, setActiveMap] = useState();
+  const [activeVideo, setActiveVideo] = useState<string>();
+  const [activeMap, setActiveMap] = useState<string>();
+
   const getRegisteredDevices = () => {
     try {
       fetch(`/api/users/${userId}/devices`)
@@ -85,6 +86,13 @@ export default function DeviceManagement() {
   useEffect(() => {
     getRegisteredDevices();
   }, []);
+
+  const getActive = () => {
+    if (activeTab === 0) {
+      return setActiveVideo;
+    }
+    return setActiveMap;
+  };
   return (
     <div className="container m-auto py-5 gap-5 grid grid-cols-[35%_auto]">
       <div className="flex flex-col gap-5">
@@ -97,10 +105,19 @@ export default function DeviceManagement() {
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           recordList={list || []}
+          setActiveRecord={getActive()}
         />
       </div>
       <div className="h-full">
-        {activeTab == 0 ? <VideoPlayer src={"/videos/mov_bbb.mp4"} /> : <Map />}
+        {loading ? (
+          <div className="flex items-center justify-center h-full">
+            <div>Loading...</div>
+          </div>
+        ) : activeTab == 0 ? (
+          <VideoPlayer src={activeVideo} />
+        ) : (
+          <Map src={activeMap} />
+        )}
       </div>
     </div>
   );

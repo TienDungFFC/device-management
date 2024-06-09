@@ -13,7 +13,13 @@ export async function fetcherNode<T>(
   input: RequestInfo | URL,
   init?: RequestInit
 ): Promise<T> {
-  return fetch(`${NODE_HOST}/api${input}`, init).then(async (res) =>
-    res.json()
-  );
+  const response = await fetch(`${NODE_HOST}/api${input}`, init);
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    console.log("");
+    throw new Error(errorData.message || "An error occurred");
+  }
+
+  return response.json();
 }

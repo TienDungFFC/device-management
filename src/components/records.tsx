@@ -9,13 +9,14 @@ interface Props {
   activeTab: number;
   setActiveTab: Dispatch<SetStateAction<number>>;
   recordList: Record[];
+  setActiveRecord: Dispatch<SetStateAction<string | undefined>>;
 }
 
 export default function Records(props: Props) {
-  const { tabs, activeTab, setActiveTab, recordList } = props;
+  const { tabs, activeTab, setActiveTab, recordList, setActiveRecord } = props;
 
   return (
-    <div className="border-solid border-[1px] rounded-xl p-5 border-[#e7e7e7e]">
+    <div className="border-solid border-[1px] rounded-xl p-5 border-[#e7e7e7e] max-h-[400px] overflow-y-auto">
       <div className="inline-block p-2 bg-[#e7e7e7] rounded-xl">
         {tabs.map((tab, i) => (
           <button
@@ -43,7 +44,12 @@ export default function Records(props: Props) {
             recordList.map((record, i) => {
               return (
                 <tr key={i} className="text-center-except-first">
-                  <td>{record.filename}</td>
+                  <td
+                    className="cursor-pointer"
+                    onClick={() => setActiveRecord(record?.filename || "")}
+                  >
+                    {record.filename}
+                  </td>
                   <td>{record.created_at}</td>
                   <td>
                     <DeleteIcon />

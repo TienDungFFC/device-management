@@ -1,3 +1,5 @@
+export const revalidate = 0;
+
 import { fetcher, fetcherNode } from "@/utils/fetcher";
 import { NextRequest, NextResponse } from "next/server";
 

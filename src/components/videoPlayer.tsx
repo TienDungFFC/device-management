@@ -9,7 +9,12 @@ const VideoPlayer = ({ src }: { src?: string }) => {
   }
   return (
     <div className="w-full mx-auto">
-      <video className="w-full h-auto" controls src={src} typeof="video/mp4">
+      <video
+        className="w-full h-auto"
+        controls
+        src={`/videos/${src}.mp4`}
+        typeof="video/mp4"
+      >
         Your browser does not support the video tag.
       </video>
     </div>
