@@ -4,7 +4,7 @@ export interface RecordProps {
 }
 
 export interface RegisteredDevice {
-  id: string;
+  id: number;
   name: string;
   user_id: number;
   status: number;
