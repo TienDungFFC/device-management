@@ -43,7 +43,7 @@ export default function Records(props: Props) {
             recordList.length > 0 &&
             recordList.map((record, i) => {
               return (
-                <tr key={i} className="text-center-except-first">
+                <tr key={i} className="text-center-except-first text-black">
                   <td
                     className="cursor-pointer"
                     onClick={() => setActiveRecord(record?.filename || "")}

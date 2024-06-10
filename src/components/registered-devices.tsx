@@ -91,7 +91,7 @@ export default function RegisteredDevices({
           {registeredDevices &&
             registeredDevices.length > 0 &&
             registeredDevices.map((resgisteredDevice, i) => (
-              <tr key={i} className="text-center-except-first">
+              <tr key={i} className="text-center-except-first text-black">
                 <td>{resgisteredDevice.name}</td>
                 <td>{resgisteredDevice.id}</td>
                 <td>
