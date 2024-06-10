@@ -23,7 +23,7 @@ export default function Records(props: Props) {
             key={i}
             className={`${
               activeTab === i ? "bg-white" : "bg-none"
-            } py-2 px-3 font-bold rounded-md`}
+            } py-2 px-3 font-bold rounded-md text-black`}
             onClick={() => setActiveTab(i)}
           >
             {tab.title}

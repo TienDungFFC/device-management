@@ -76,7 +76,7 @@ export default function RegisteredDevices({
   };
   return (
     <div className="border-solid border-[1px] rounded-xl p-5 border-[#e7e7e7e] max-h-[600px] overflow-y-auto">
-      <h3 className="font-bold text-lg mb-2">Registered Devices</h3>
+      <h3 className="font-bold text-lg mb-2 text-black">Registered Devices</h3>
 
       <table className="table-auto w-full">
         <thead>

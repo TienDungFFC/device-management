@@ -17,7 +17,7 @@ export default function Header() {
   return (
     <div className="border-b">
       <div className="h-16 border-1 flex justify-between items-center container m-auto">
-        <h2 className="font-bold">CE32 PROEJCT</h2>
+        <h2 className="font-bold">CE232 PROEJCT</h2>
         <div className="flex gap-4 items-center">
           <button className="h-10 w-12 bg-[#e2e1e1] font-bold rounded-lg flex items-center justify-center leading-none text-black">
             <span className="mt-[-6px] inline-block">...</span>
