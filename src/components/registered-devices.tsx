@@ -74,6 +74,19 @@ export default function RegisteredDevices({
     updatedNewDevices.splice(index, 1);
     setNewDevices(updatedNewDevices);
   };
+
+  const handleDelete = async (id: number) => {
+    try {
+      const res = await fetch(`/api/devices/${id}`, {
+        method: "DELETE",
+      });
+      if (res.status === 200) {
+        getRegisteredDevices();
+      }
+    } catch (error) {
+      console.error("Error deleting device:", error);
+    }
+  };
   return (
     <div className="border-solid border-[1px] rounded-xl p-5 border-[#e7e7e7e] max-h-[600px] overflow-y-auto">
       <h3 className="font-bold text-lg mb-2 text-black">Registered Devices</h3>
@@ -102,7 +115,18 @@ export default function RegisteredDevices({
                   )}
                 </td>
                 <td>
-                  <div className="text-center flex justify-center">
+                  <div
+                    className="text-center flex justify-center"
+                    onClick={() => {
+                      if (
+                        window.confirm(
+                          "Are you sure you want to delete this device?"
+                        )
+                      ) {
+                        handleDelete(resgisteredDevice.id);
+                      }
+                    }}
+                  >
                     <DeleteIcon />
                   </div>
                 </td>
