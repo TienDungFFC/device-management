@@ -85,7 +85,6 @@ export default function DeviceManagement() {
   }, [activeTab, userId]);
 
   const getRegisteredDevices = async () => {
-    // Kiểm tra window tồn tại trước khi sử dụng fetch
     if (typeof window !== "undefined") {
       try {
         const response = await fetch(`/api/users/${userId}/devices`);
