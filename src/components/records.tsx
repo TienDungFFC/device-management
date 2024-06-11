@@ -33,8 +33,10 @@ export default function Records(props: Props) {
             activeTab === 0 ? "records" : "timelines"
           }`
         );
-        const data = await res.json();
-        setRecordList(data);
+        if (res.ok) {
+          const data = await res.json();
+          setRecordList(data);
+        }
       } catch (err) {
         console.error("Error fetching records:", err);
       }
@@ -65,7 +67,7 @@ export default function Records(props: Props) {
           </button>
         ))}
       </div>
-      <table className="table-auto mt-4">
+      <table className="table-auto mt-4 w-full">
         <thead>
           <tr className="text-[#a1a1a1] border-b-[1px]">
             <th className="text-left w-[50%]">Name</th>

@@ -23,7 +23,15 @@ const tabs = [
     api: getTimelinesByUserId,
   },
 ];
-
+// const isRegisteredDeviceArray = (data: any): data is RegisteredDevice[] => {
+//   if (!Array.isArray(data)) return false;
+//   return data.every(
+//     (item) =>
+//       typeof item.id === "number" &&
+//       typeof item.name === "string" &&
+//       typeof item.status === "number"
+//   );
+// };
 export default function DeviceManagement() {
   const userId = localStorage.getItem("userId");
   const router = useRouter();
@@ -45,16 +53,20 @@ export default function DeviceManagement() {
   const [activeMap, setActiveMap] = useState<string>();
 
   const getRegisteredDevices = () => {
-    try {
-      fetch(`/api/users/${userId}/devices`)
-        .then((res) => res.json())
-        .then((data) => {
-          setRegisteredDevices(data);
-          setLoading(false);
-        });
-    } catch (err: any) {
-      setError(err.message);
-    }
+    fetch(`/api/users/${userId}/devices`)
+      .then((res) => {
+        if (res.status === 200) {
+          return res.json();
+        } else {
+          throw new Error("Failed to fetch devices");
+        }
+      })
+      .then((data) => {
+        setRegisteredDevices(data);
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
   };
   useEffect(() => {
     const fetchData = () => {
@@ -98,18 +110,16 @@ export default function DeviceManagement() {
     const formData = new FormData();
     formData.append("type", String(activeTab));
     try {
-
       const res = await fetch(`/api/records/${recordId}`, {
-        method: "POST", 
+        method: "POST",
         body: formData,
       });
       const updatedList = list?.filter((record) => record.id !== recordId);
       setList(updatedList);
     } catch (err) {
-      console.log("Error deleting record", err)
+      console.log("Error deleting record", err);
     }
-  }
-  
+  };
 
   return (
     <div className="container m-auto py-5 gap-5 grid grid-cols-[35%_auto]">
