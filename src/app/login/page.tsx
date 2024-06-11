@@ -12,27 +12,34 @@ export default function Login() {
   }
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string>("");
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     const formData = new FormData();
     formData.append("username", username);
     formData.append("password", password);
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        body: formData,
+      });
 
-    const res = await fetch("/api/login", {
-      method: "POST",
-      body: formData,
-    });
+      const data = await res.json();
+      if (res.status !== 200) {
+        console.log("error data: ", data);
 
-    const data = await res.json();
-    if (res.status !== 200) {
-      setError(data.message);
-      return;
+        setError(data.message);
+        return;
+      }
+      if (typeof window !== "undefined") {
+        localStorage.setItem("userId", data.userId);
+      }
+    } catch (error: any) {
+      console.log("error data: ", error);
+      setError(error);
     }
-    if (typeof window !== "undefined") {
-      localStorage.setItem("userId", data.userId);
-    }
+
     router.push("/device-management");
   };
 

@@ -1,5 +1,3 @@
-"use client";
-
 import { RegisteredDevice } from "@/types";
 import DeleteIcon from "./icons/delete";
 import { useState, useEffect } from "react";
@@ -26,6 +24,16 @@ export default function RegisteredDevices({
 
     return () => clearInterval(intervalId);
   }, [getRegisteredDevices]);
+
+  useEffect(() => {
+    let timeout: NodeJS.Timeout;
+    if (errorRegisteredDevice) {
+      timeout = setTimeout(() => {
+        setErrorRegisteredDevice(null);
+      }, 5000);
+    }
+    return () => clearTimeout(timeout);
+  }, [errorRegisteredDevice]);
 
   if (!registeredDevices) {
     return null;
@@ -112,15 +120,15 @@ export default function RegisteredDevices({
         <tbody>
           {registeredDevices &&
             registeredDevices.length > 0 &&
-            registeredDevices.map((resgisteredDevice, i) => (
+            registeredDevices.map((registeredDevice, i) => (
               <tr
                 key={i}
                 className="text-center-except-first text-black border-b-[1px]"
               >
-                <td>{resgisteredDevice.name}</td>
-                <td>{resgisteredDevice.id}</td>
+                <td>{registeredDevice.name}</td>
+                <td>{registeredDevice.id}</td>
                 <td>
-                  {resgisteredDevice.status === 1 ? (
+                  {registeredDevice.status === 1 ? (
                     <span className="text-[#2a9a20]">online</span>
                   ) : (
                     "offline"
@@ -136,7 +144,7 @@ export default function RegisteredDevices({
                             "Are you sure you want to delete this device?"
                           )
                         ) {
-                          handleDelete(resgisteredDevice.id);
+                          handleDelete(registeredDevice.id);
                         }
                       }
                     }}

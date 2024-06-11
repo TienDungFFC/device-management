@@ -24,10 +24,13 @@ export default function Register() {
       method: "POST",
       body: formData,
     });
-    if (res.status !== 200) {
-    }
-    console.log("Res: ", res);
     const data = await res.json();
+    if (res.status !== 200) {
+      console.log("error data: ", data);
+
+      setError(data.message);
+      return;
+    }
 
     if (res.status === 200) {
       router.push("/login");

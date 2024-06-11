@@ -19,8 +19,9 @@ export async function POST(req: Request) {
         "Content-Type": "application/json",
       },
     });
-  } catch (err) {
-    return new NextResponse(JSON.stringify(err ?? null), {
+  } catch (err: any) {
+    console.log("errorLogin: ", err.message);
+    return new NextResponse(JSON.stringify({ message: err?.message || "" }), {
       status: 500,
       headers: {
         "Content-Type": "application/json",

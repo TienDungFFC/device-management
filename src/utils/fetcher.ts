@@ -17,7 +17,7 @@ export async function fetcherNode<T>(
 
   if (!response.ok) {
     const errorData = await response.json();
-    console.log("");
+    console.log("errorData", errorData);
     throw new Error(errorData.message || "An error occurred");
   }
 
