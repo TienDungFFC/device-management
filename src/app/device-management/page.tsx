@@ -1,6 +1,5 @@
 import dynamic from "next/dynamic";
 
-// Sử dụng dynamic import cho Header và DeviceManagement components
 const DynamicHeader = dynamic(() => import("@/components/header"), {
   ssr: false,
 });
