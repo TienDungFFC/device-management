@@ -1,4 +1,3 @@
-"use client";
 import { useEffect, useState } from "react";
 import { SetStateAction, Dispatch } from "react";
 import DeleteIcon from "./icons/delete";
@@ -9,7 +8,7 @@ interface Props {
   activeTab: number;
   setActiveTab: Dispatch<SetStateAction<number>>;
   recordList: Record[];
-  setRecordList: Dispatch<SetStateAction<Record[] | undefined>>;
+  setRecordList: Dispatch<SetStateAction<Record[]>>;
   setActiveRecord: Dispatch<SetStateAction<string | undefined>>;
   onDeleteRecord: (recordId: string) => void;
 }
@@ -28,14 +27,16 @@ export default function Records(props: Props) {
   useEffect(() => {
     const fetchRecords = async () => {
       try {
-        const res = await fetch(
-          `/api/users/${localStorage.getItem("userId")}/${
-            activeTab === 0 ? "records" : "timelines"
-          }`
-        );
-        if (res.ok) {
-          const data = await res.json();
-          setRecordList(data);
+        if (typeof window !== "undefined") {
+          const res = await fetch(
+            `/api/users/${localStorage.getItem("userId")}/${
+              activeTab === 0 ? "records" : "timelines"
+            }`
+          );
+          if (res.ok) {
+            const data = await res.json();
+            setRecordList(data);
+          }
         }
       } catch (err) {
         console.error("Error fetching records:", err);
@@ -50,6 +51,14 @@ export default function Records(props: Props) {
 
     return () => clearInterval(intervalId);
   }, [activeTab, setRecordList]);
+
+  const handleDeleteConfirmation = (recordId: string) => {
+    if (typeof window !== "undefined") {
+      if (window.confirm("Are you sure you want to delete this record?")) {
+        onDeleteRecord(recordId);
+      }
+    }
+  };
 
   return (
     <div className="border-solid border-[1px] rounded-xl p-5 border-[#e7e7e7e] max-h-[400px] overflow-y-auto">
@@ -92,15 +101,7 @@ export default function Records(props: Props) {
                   {record.filename}
                 </td>
                 <td>{record.created_at}</td>
-                <td
-                  onClick={() => {
-                    if (
-                      confirm("Are you sure you want to delete this record?")
-                    ) {
-                      onDeleteRecord(record.id);
-                    }
-                  }}
-                >
+                <td onClick={() => handleDeleteConfirmation(record.id)}>
                   <DeleteIcon />
                 </td>
               </tr>

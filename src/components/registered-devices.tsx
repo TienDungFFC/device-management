@@ -15,7 +15,9 @@ export default function RegisteredDevices({
   const [newDevices, setNewDevices] = useState<{ name: string; id: string }[]>([
     { name: "", id: "" },
   ]);
-  const [errorRegisteredDevice, setErrorRegisteredDevice] = useState<string | null>(null);
+  const [errorRegisteredDevice, setErrorRegisteredDevice] = useState<
+    string | null
+  >(null);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -51,7 +53,9 @@ export default function RegisteredDevices({
         const formData = new FormData();
         formData.append("id", newDevice.id);
         formData.append("name", newDevice.name);
-        formData.append("userId", localStorage.getItem("userId") || "");
+        if (typeof window !== "undefined") {
+          formData.append("userId", localStorage.getItem("userId") || "");
+        }
         const res = await fetch("/api/devices/register", {
           method: "POST",
           body: formData,
@@ -109,7 +113,10 @@ export default function RegisteredDevices({
           {registeredDevices &&
             registeredDevices.length > 0 &&
             registeredDevices.map((resgisteredDevice, i) => (
-              <tr key={i} className="text-center-except-first text-black border-b-[1px]">
+              <tr
+                key={i}
+                className="text-center-except-first text-black border-b-[1px]"
+              >
                 <td>{resgisteredDevice.name}</td>
                 <td>{resgisteredDevice.id}</td>
                 <td>
@@ -123,12 +130,14 @@ export default function RegisteredDevices({
                   <div
                     className="text-center flex justify-center"
                     onClick={() => {
-                      if (
-                        confirm(
-                          "Are you sure you want to delete this device?"
-                        )
-                      ) {
-                        handleDelete(resgisteredDevice.id);
+                      if (typeof window !== "undefined" && window.confirm) {
+                        if (
+                          window.confirm(
+                            "Are you sure you want to delete this device?"
+                          )
+                        ) {
+                          handleDelete(resgisteredDevice.id);
+                        }
                       }
                     }}
                   >
@@ -181,10 +190,13 @@ export default function RegisteredDevices({
           ))}
         </tbody>
       </table>
-      <p
-        className="text-center mt-3 text-gray-400"
-      >
-        <span className="cursor-pointer p-2 hover:text-gray-500" onClick={handleAddNewDevice}>New device</span>
+      <p className="text-center mt-3 text-gray-400">
+        <span
+          className="cursor-pointer p-2 hover:text-gray-500"
+          onClick={handleAddNewDevice}
+        >
+          New device
+        </span>
       </p>
       {errorRegisteredDevice && (
         <p className="text-center text-red-500 mt-2">{errorRegisteredDevice}</p>

@@ -9,9 +9,11 @@ export default function Header() {
   const router = useRouter();
 
   const handleLogout = () => {
-    if (confirm("Are you sure you want to logout?")) {
-      localStorage.removeItem("userId");
-      router.push("/login");
+    if (typeof window !== "undefined" && window.confirm) {
+      if (window.confirm("Are you sure you want to logout?")) {
+        localStorage.removeItem("userId");
+        router.push("/login");
+      }
     }
   };
   return (

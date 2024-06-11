@@ -1,4 +1,5 @@
 "use client";
+import dynamic from "next/dynamic";
 
 import Map from "@/components/map";
 import RegisteredDevices from "./registered-devices";
@@ -8,7 +9,9 @@ import VideoPlayer from "./videoPlayer";
 import { Record, RegisteredDevice } from "@/types";
 import { getTimelinesByUserId, getRecordsByUserId } from "@/libs";
 import { useRouter } from "next/navigation";
-
+const DynamicMap = dynamic(() => import("@/components/map"), {
+  ssr: false,
+});
 const tabs = [
   {
     title: "Records",
@@ -23,102 +26,101 @@ const tabs = [
     api: getTimelinesByUserId,
   },
 ];
-// const isRegisteredDeviceArray = (data: any): data is RegisteredDevice[] => {
-//   if (!Array.isArray(data)) return false;
-//   return data.every(
-//     (item) =>
-//       typeof item.id === "number" &&
-//       typeof item.name === "string" &&
-//       typeof item.status === "number"
-//   );
-// };
+
 export default function DeviceManagement() {
-  const userId = localStorage.getItem("userId");
   const router = useRouter();
-
-  useEffect(() => {
-    if (!userId) {
-      router.push("/login");
-    }
-  }, [userId, router]);
-
+  const [userId, setUserId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState(0);
-  const [list, setList] = useState<Record[]>();
+  const [list, setList] = useState<Record[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [registeredDevices, setRegisteredDevices] =
-    useState<RegisteredDevice[]>();
-
+  const [registeredDevices, setRegisteredDevices] = useState<
+    RegisteredDevice[] | undefined
+  >();
   const [activeVideo, setActiveVideo] = useState<string>();
   const [activeMap, setActiveMap] = useState<string>();
 
-  const getRegisteredDevices = () => {
-    fetch(`/api/users/${userId}/devices`)
-      .then((res) => {
-        if (res.status === 200) {
-          return res.json();
-        } else {
-          throw new Error("Failed to fetch devices");
-        }
-      })
-      .then((data) => {
-        setRegisteredDevices(data);
-      })
-      .catch((err) => {
-        console.log(err.message);
-      });
-  };
   useEffect(() => {
-    const fetchData = () => {
+    if (typeof window !== "undefined") {
+      const userIdFromStorage = localStorage.getItem("userId");
+      if (!userIdFromStorage) {
+        router.push("/login");
+      } else {
+        setUserId(userIdFromStorage);
+      }
+    }
+  }, [router]);
+
+  useEffect(() => {
+    if (userId) {
+      getRegisteredDevices();
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    const fetchData = async () => {
       setLoading(true);
-      setError(null);
       try {
-        fetch(
-          `/api/users/${userId}/${activeTab == 0 ? "records" : "timelines"}`
-        )
-          .then((res) => res.json())
-          .then((data) => {
-            setList(data);
-            if (activeTab == 0) {
-              setActiveVideo(data[0]?.filename || "");
-            } else {
-              setActiveMap(data[0]?.filename || "");
-            }
-            setLoading(false);
-          });
-      } catch (err: any) {
-        setError(err.message);
+        const response = await fetch(
+          `/api/users/${userId}/${activeTab === 0 ? "records" : "timelines"}`
+        );
+        if (!response.ok) {
+          throw new Error("Failed to fetch data");
+        }
+        const data = await response.json();
+        setList(data);
+        if (activeTab === 0) {
+          setActiveVideo(data[0]?.filename || "");
+        } else {
+          setActiveMap(data[0]?.filename || "");
+        }
+      } catch (err) {
+        console.error("Error fetching data:", err);
       }
       setLoading(false);
     };
 
-    fetchData();
+    if (userId !== null) {
+      fetchData();
+    }
   }, [activeTab, userId]);
 
-  useEffect(() => {
-    getRegisteredDevices();
-  }, []);
-
-  const getActive = () => {
-    if (activeTab === 0) {
-      return setActiveVideo;
+  const getRegisteredDevices = async () => {
+    // Kiểm tra window tồn tại trước khi sử dụng fetch
+    if (typeof window !== "undefined") {
+      try {
+        const response = await fetch(`/api/users/${userId}/devices`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch devices");
+        }
+        const data = await response.json();
+        setRegisteredDevices(data);
+      } catch (err) {
+        console.error("Error fetching devices:", err);
+      }
     }
-    return setActiveMap;
   };
 
   const onDeleteRecord = async (recordId: string) => {
     const formData = new FormData();
     formData.append("type", String(activeTab));
     try {
-      const res = await fetch(`/api/records/${recordId}`, {
+      const response = await fetch(`/api/records/${recordId}`, {
         method: "POST",
         body: formData,
       });
-      const updatedList = list?.filter((record) => record.id !== recordId);
-      setList(updatedList);
+      if (response.ok) {
+        const updatedList = list.filter((record) => record.id !== recordId);
+        setList(updatedList);
+      } else {
+        throw new Error("Failed to delete record");
+      }
     } catch (err) {
-      console.log("Error deleting record", err);
+      console.error("Error deleting record", err);
     }
+  };
+
+  const getActive = () => {
+    return activeTab === 0 ? setActiveVideo : setActiveMap;
   };
 
   return (
@@ -132,7 +134,7 @@ export default function DeviceManagement() {
           tabs={tabs}
           activeTab={activeTab}
           setActiveTab={setActiveTab}
-          recordList={list || []}
+          recordList={list}
           setActiveRecord={getActive()}
           onDeleteRecord={onDeleteRecord}
           setRecordList={setList}
@@ -143,10 +145,10 @@ export default function DeviceManagement() {
           <div className="flex items-center justify-center h-full">
             <div>Loading...</div>
           </div>
-        ) : activeTab == 0 ? (
+        ) : activeTab === 0 ? (
           <VideoPlayer src={activeVideo} />
         ) : (
-          <Map src={activeMap} />
+          <DynamicMap src={activeMap} />
         )}
       </div>
     </div>

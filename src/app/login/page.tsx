@@ -5,8 +5,10 @@ import Link from "next/link";
 
 export default function Login() {
   const router = useRouter();
-  if (localStorage.getItem("userId")) {
-    router.push("/device-management");
+  if (typeof window !== "undefined") {
+    if (localStorage.getItem("userId")) {
+      router.push("/device-management");
+    }
   }
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -28,8 +30,9 @@ export default function Login() {
       setError(data.message);
       return;
     }
-
-    localStorage.setItem("userId", data.userId);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("userId", data.userId);
+    }
     router.push("/device-management");
   };
 

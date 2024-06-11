@@ -1,5 +1,5 @@
 "use client";
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Polyline, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -27,11 +27,11 @@ const UpdateMapCenter = ({ center }: { center: [number, number] }) => {
 const HeartMap = ({ src }: { src?: string }) => {
   const [data, setData] = useState<Coordinate[] | undefined>();
   const [center, setCenter] = useState<[number, number]>();
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (src) {
-      setLoading(true); 
+    if (src && typeof window !== "undefined") {
+      setLoading(true);
       fetch(`/api/timeline/${src}`)
         .then((response) => response.json())
         .then((data: Coordinate[]) => {
@@ -39,7 +39,7 @@ const HeartMap = ({ src }: { src?: string }) => {
           if (data.length > 0) {
             setCenter(calculateCenter(data));
           }
-          setLoading(false); 
+          setLoading(false);
         })
         .catch(() => {
           setLoading(false);

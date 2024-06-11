@@ -1,5 +1,8 @@
 import type { Config } from "tailwindcss";
 const plugin = require("tailwindcss/plugin");
+type AddUtilities = (utilities: {
+  [key: string]: { [key: string]: string };
+}) => void;
 
 const config: Config = {
   content: [
@@ -17,7 +20,7 @@ const config: Config = {
     },
   },
   plugins: [
-    plugin(function ({ addUtilities }) {
+    plugin(function ({ addUtilities }: { addUtilities: AddUtilities }) {
       addUtilities({
         ".text-center-except-first > :not(:first-child)": {
           textAlign: "center",
