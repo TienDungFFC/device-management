@@ -2,7 +2,7 @@
 
 import { RegisteredDevice } from "@/types";
 import DeleteIcon from "./icons/delete";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 /* eslint-disable react/no-unescaped-entities */
 
 export default function RegisteredDevices({
@@ -12,18 +12,22 @@ export default function RegisteredDevices({
   registeredDevices: RegisteredDevice[] | undefined;
   getRegisteredDevices: () => void;
 }) {
-  if (!registeredDevices) {
-    return null;
-  }
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const [newDevices, setNewDevices] = useState<{ name: string; id: string }[]>([
     { name: "", id: "" },
   ]);
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [errorRegisteredDevice, setErrorRegisteredDevice] = useState<
-    string | null
-  >(null);
+  const [errorRegisteredDevice, setErrorRegisteredDevice] = useState<string | null>(null);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      getRegisteredDevices();
+    }, 5000);
+
+    return () => clearInterval(intervalId);
+  }, [getRegisteredDevices]);
+
+  if (!registeredDevices) {
+    return null;
+  }
 
   const handleAddNewDevice = () => {
     setNewDevices([...newDevices, { name: "", id: "" }]);
@@ -87,6 +91,7 @@ export default function RegisteredDevices({
       console.error("Error deleting device:", error);
     }
   };
+
   return (
     <div className="border-solid border-[1px] rounded-xl p-5 border-[#e7e7e7e] max-h-[600px] overflow-y-auto">
       <h3 className="font-bold text-lg mb-2 text-black">Registered Devices</h3>
@@ -104,7 +109,7 @@ export default function RegisteredDevices({
           {registeredDevices &&
             registeredDevices.length > 0 &&
             registeredDevices.map((resgisteredDevice, i) => (
-              <tr key={i} className="text-center-except-first text-black">
+              <tr key={i} className="text-center-except-first text-black border-b-[1px]">
                 <td>{resgisteredDevice.name}</td>
                 <td>{resgisteredDevice.id}</td>
                 <td>
@@ -119,7 +124,7 @@ export default function RegisteredDevices({
                     className="text-center flex justify-center"
                     onClick={() => {
                       if (
-                        window.confirm(
+                        confirm(
                           "Are you sure you want to delete this device?"
                         )
                       ) {
@@ -177,10 +182,9 @@ export default function RegisteredDevices({
         </tbody>
       </table>
       <p
-        className="text-center mt-3 text-gray-400 cursor-pointer"
-        onClick={handleAddNewDevice}
+        className="text-center mt-3 text-gray-400"
       >
-        New device
+        <span className="cursor-pointer p-2 hover:text-gray-500" onClick={handleAddNewDevice}>New device</span>
       </p>
       {errorRegisteredDevice && (
         <p className="text-center text-red-500 mt-2">{errorRegisteredDevice}</p>

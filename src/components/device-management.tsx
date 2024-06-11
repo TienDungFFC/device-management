@@ -93,6 +93,24 @@ export default function DeviceManagement() {
     }
     return setActiveMap;
   };
+
+  const onDeleteRecord = async (recordId: string) => {
+    const formData = new FormData();
+    formData.append("type", String(activeTab));
+    try {
+
+      const res = await fetch(`/api/records/${recordId}`, {
+        method: "POST", 
+        body: formData,
+      });
+      const updatedList = list?.filter((record) => record.id !== recordId);
+      setList(updatedList);
+    } catch (err) {
+      console.log("Error deleting record", err)
+    }
+  }
+  
+
   return (
     <div className="container m-auto py-5 gap-5 grid grid-cols-[35%_auto]">
       <div className="flex flex-col gap-5">
@@ -106,6 +124,8 @@ export default function DeviceManagement() {
           setActiveTab={setActiveTab}
           recordList={list || []}
           setActiveRecord={getActive()}
+          onDeleteRecord={onDeleteRecord}
+          setRecordList={setList}
         />
       </div>
       <div className="h-full">

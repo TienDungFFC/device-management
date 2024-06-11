@@ -2,6 +2,7 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { MapContainer, TileLayer, Polyline, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
+
 interface Coordinate {
   lat: number;
   lng: number;
@@ -14,6 +15,7 @@ const calculateCenter = (coordinates: Coordinate[]): [number, number] => {
   const lngCenter = lngSum / coordinates.length;
   return [latCenter, lngCenter];
 };
+
 const UpdateMapCenter = ({ center }: { center: [number, number] }) => {
   const map = useMap();
   useEffect(() => {
@@ -25,8 +27,11 @@ const UpdateMapCenter = ({ center }: { center: [number, number] }) => {
 const HeartMap = ({ src }: { src?: string }) => {
   const [data, setData] = useState<Coordinate[] | undefined>();
   const [center, setCenter] = useState<[number, number]>();
+  const [loading, setLoading] = useState(true); 
+
   useEffect(() => {
     if (src) {
+      setLoading(true); 
       fetch(`/api/timeline/${src}`)
         .then((response) => response.json())
         .then((data: Coordinate[]) => {
@@ -34,20 +39,31 @@ const HeartMap = ({ src }: { src?: string }) => {
           if (data.length > 0) {
             setCenter(calculateCenter(data));
           }
+          setLoading(false); 
+        })
+        .catch(() => {
+          setLoading(false);
         });
     }
   }, [src]);
-  if (!data || !center || Number.isNaN(center[0])) {
-    return null;
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-full">
+        <div className="loader"></div>
+      </div>
+    );
   }
 
-  console.log("center: ", center);
+  if (!data || !center || Number.isNaN(center[0])) {
+    return <div>No timelines found</div>;
+  }
 
   return (
     <MapContainer
       center={center}
       zoom={15}
-      style={{ height: "1000px", width: "100%" }}
+      className="w-full h-[calc(100vh-110px)] rounded-lg"
     >
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
